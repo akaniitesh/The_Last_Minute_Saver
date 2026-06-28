@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with tasks, scanned documents, medications, medication logs, and settings.",
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "description": "The tasks created by the user."
+        },
+        "scannedDocs": {
+          "type": "array",
+          "description": "Scanned documents uploaded by the user."
+        },
+        "medications": {
+          "type": "array",
+          "description": "Medications tracked by the user."
+        },
+        "medication_logs": {
+          "type": "array",
+          "description": "Medication logs."
+        },
+        "emergency_info": {
+          "type": "object",
+          "description": "Emergency clinical contact information."
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private user document mapped to Firebase Auth UID."
+    }
+  }
+}
