@@ -16,15 +16,15 @@ import {
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Configuration from firebase-applet-config.json
+// Configuration loaded from environment variables (defined at build time or run time)
 const firebaseConfig = {
-  apiKey: "AIzaSyC6yl2kDqI7PvhMT2rN8EHp_IUSOT3Tfjk",
-  authDomain: "nice-setting-sbcl8.firebaseapp.com",
-  projectId: "nice-setting-sbcl8",
-  storageBucket: "nice-setting-sbcl8.firebasestorage.app",
-  messagingSenderId: "837151924151",
-  appId: "1:837151924151:web:4d7254a5fe8ebd79749232",
-  firestoreDatabaseId: "ai-studio-03fee2e7-e030-462e-a654-474c51bd064c"
+  apiKey: (import.meta.env.VITE_FIREBASE_API_KEY as string) || "",
+  authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string) || "",
+  projectId: (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) || "",
+  storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) || "",
+  messagingSenderId: (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || "",
+  appId: (import.meta.env.VITE_FIREBASE_APP_ID as string) || "",
+  firestoreDatabaseId: (import.meta.env.VITE_FIREBASE_DATABASE_ID as string) || ""
 };
 
 // Initialize Firebase
