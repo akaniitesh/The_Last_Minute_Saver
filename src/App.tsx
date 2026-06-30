@@ -13,7 +13,7 @@ import HabitsTab from "./components/HabitsTab";
 import CollaborationTab from "./components/CollaborationTab";
 import GuidanceTab from "./components/GuidanceTab";
 import SettingsTab from "./components/SettingsTab";
-import SmartMapTab from "./components/SmartMapTab";
+import { SmartMapPage } from "./smart-map-v2";
 import MedicineTab from "./components/MedicineTab";
 import SuccessPlannerTab from "./components/SuccessPlannerTab";
 import EventCaptureTab from "./components/EventCaptureTab";
@@ -1769,7 +1769,7 @@ export default function App() {
             )}
 
             {activeTab === "smart_map" && (
-              <SmartMapTab 
+              <SmartMapPage 
                 tasks={tasks}
                 onAddTask={handleAddTask}
                 onUpdateTask={handleUpdateTask}
