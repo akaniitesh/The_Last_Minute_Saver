@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, TouchEvent, useCallback } from "react";
+import React, { useState, useEffect, useRef, TouchEvent, useCallback } from "react";
 import { applyGlobalStyles } from "./utils/styles";
 import { motion, AnimatePresence } from "motion/react";
 import { Task, ScannedDoc } from "./types";
@@ -17,7 +17,7 @@ import SmartMapTab from "./components/SmartMapTab";
 import MedicineTab from "./components/MedicineTab";
 import SuccessPlannerTab from "./components/SuccessPlannerTab";
 import EventCaptureTab from "./components/EventCaptureTab";
-import VoiceAssistantCompanion from "./components/VoiceAssistantCompanion";
+import { MiloProvider, MiloShell } from "./milo-v2";
 import NotificationCenter, { AppNotification } from "./components/NotificationCenter";
 import { useAuth } from "./context/AuthContext";
 import { AuthView } from "./components/AuthView";
@@ -882,10 +882,20 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-700 bg-[#FAFAFA] ${
+    <div className={`h-[100dvh] md:h-auto md:min-h-screen flex flex-col md:block overflow-hidden md:overflow-visible transition-colors duration-700 bg-[#FAFAFA] ${
       isRescueMode ? "bg-red-50/40 text-red-950" : "text-gray-900"
     }`}>
       
+      <MiloProvider
+        parentTasks={tasks}
+        parentIsRescueMode={isRescueMode}
+        onAddTask={handleAddTask}
+        onNavigateTab={setActiveTab}
+        onToggleRescueMode={handleToggleRescueMode}
+        onSetClockMode={setClockMode}
+        onSetVoiceIntensity={setVoiceIntensity}
+      >
+
       {/* Offline Mode Banner */}
       {isOffline && (
         <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 text-xs font-mono text-center flex items-center justify-center gap-2 animate-pulse shadow-inner">
@@ -900,7 +910,7 @@ export default function App() {
       )}
       
       {/* 1. TOP HEADER NAVIGATION BAR */}
-      <header className="border-b border-gray-100 bg-white sticky top-0 z-50">
+      <header className="border-b border-gray-100 bg-white sticky top-0 z-50 shrink-0">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           
           <div className="flex items-center gap-3">
@@ -1017,7 +1027,12 @@ export default function App() {
       </header>
 
       {/* 2. DUAL-COLUMN LAYOUT: Side Dashboard + Main Interface + Animated Clock */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6">
+      <div 
+        className="max-w-7xl mx-auto w-full px-4 md:px-6 py-4 md:py-8 space-y-6 flex-1 overflow-y-auto md:overflow-visible overscroll-behavior-contain pb-[var(--mobile-pb,2rem)] md:pb-8"
+        style={{
+          '--mobile-pb': 'calc(100px + env(safe-area-inset-bottom))'
+        } as React.CSSProperties}
+      >
         
         {/* CRITICAL OVERRIDE SYSTEM INTERRUPT ALERT BANNER */}
         {pendingCriticalAlert && (
@@ -1934,7 +1949,13 @@ export default function App() {
       </AnimatePresence>
 
       {/* 4. MOBILE BOTTOM NAVIGATION BAR */}
-      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-t border-gray-150 shadow-lg flex items-center justify-around px-4 md:hidden z-30 font-sans">
+      <nav 
+        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-150 shadow-lg flex items-center justify-around px-4 md:hidden z-30 font-sans"
+        style={{
+          paddingBottom: "env(safe-area-inset-bottom)",
+          height: "calc(64px + env(safe-area-inset-bottom))"
+        }}
+      >
         {/* Home */}
         <button
           onClick={() => setActiveTab("dashboard")}
@@ -2164,26 +2185,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* AI Voice Assistant Floating Companion overlay */}
-      <VoiceAssistantCompanion 
-        tasks={tasks}
-        isRescueMode={isRescueMode}
-        onToggleRescueMode={handleToggleRescueMode}
-        onSetClockMode={setClockMode}
-        onSetVoiceIntensity={setVoiceIntensity}
-        voiceIntensity={voiceIntensity}
-        onAddTask={handleAddTask}
-        attentionMuted={attentionMuted}
-        voiceMuted={voiceMuted}
-        setVoiceMuted={setVoiceMuted}
-        voiceMuteDuration={voiceMuteDuration}
-        setVoiceMuteDuration={setVoiceMuteDuration}
-        voiceMuteSecondsLeft={voiceMuteSecondsLeft}
-        setVoiceMuteSecondsLeft={setVoiceMuteSecondsLeft}
-        isNavDrawerOpen={isMobileDrawerOpen}
-        onNavigateTab={setActiveTab}
-        onToggleQuickAdd={() => setIsQuickAddOpen(true)}
-      />
+      {/* AI Voice Assistant Floating Companion overlay (Milo V2) */}
+      <MiloShell />
 
       {/* PERSISTENT GLOBAL AI CLOCK COMPANION */}
       <GlobalAIClock 
@@ -2211,7 +2214,12 @@ export default function App() {
             animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 50, x: 20 }}
             onClick={() => setToast(null)}
-            className="fixed bottom-24 right-6 sm:bottom-6 sm:right-6 z-55 max-w-xs bg-black text-white p-4 rounded-2xl border border-neutral-800 shadow-2xl flex gap-3 cursor-pointer"
+            className="fixed right-6 sm:bottom-6 sm:right-6 z-55 max-w-xs bg-black text-white p-4 rounded-2xl border border-neutral-800 shadow-2xl flex gap-3 cursor-pointer"
+            style={{
+              bottom: typeof window !== "undefined" && window.innerWidth < 768 
+                ? "calc(80px + env(safe-area-inset-bottom))" 
+                : "1.5rem"
+            }}
           >
             <div className="p-1.5 bg-red-600 text-white rounded-lg shrink-0 h-8 w-8 flex items-center justify-center">
               <ShieldAlert size={16} className="animate-pulse" />
@@ -2323,6 +2331,7 @@ export default function App() {
         onCreateTask={handleCreateTaskFromNotification}
       />
 
+      </MiloProvider>
     </div>
   );
 }
