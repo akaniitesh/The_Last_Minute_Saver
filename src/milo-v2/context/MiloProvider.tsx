@@ -396,8 +396,11 @@ export function MiloProvider({
         }
         case "navigate": {
           if (onNavigateTab && actionPayload?.destination) {
-            // Mapping speech destinations to project tab names
             const dest = actionPayload.destination.toLowerCase();
+            
+            // Emit to map if it is a location
+            eventBus.emit("map_navigate", actionPayload);
+
             if (dest.includes("plan") || dest.includes("calendar")) {
               onNavigateTab("planner");
             } else if (dest.includes("focus") || dest.includes("timer")) {
@@ -406,6 +409,22 @@ export function MiloProvider({
               onNavigateTab("scanner");
             } else if (dest.includes("settings")) {
               onNavigateTab("settings");
+            } else if (
+              dest.includes("map") || 
+              dest.includes("college") || 
+              dest.includes("home") || 
+              dest.includes("hostel") || 
+              dest.includes("library") || 
+              dest.includes("hospital") || 
+              dest.includes("atm") || 
+              dest.includes("restaurant") || 
+              dest.includes("office") ||
+              dest.includes("gym") ||
+              dest.includes("park") ||
+              actionPayload.routeInstructions ||
+              actionPayload.eta
+            ) {
+              onNavigateTab("smart_map");
             } else {
               onNavigateTab("dashboard");
             }
