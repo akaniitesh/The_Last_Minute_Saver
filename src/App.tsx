@@ -19,6 +19,7 @@ import SuccessPlannerTab from "./components/SuccessPlannerTab";
 import EventCaptureTab from "./components/EventCaptureTab";
 import { MiloProvider, MiloShell } from "./milo-v2";
 import NotificationCenter, { AppNotification } from "./components/NotificationCenter";
+import MobileAccountMenu from "./components/MobileAccountMenu";
 import { useAuth } from "./context/AuthContext";
 import { AuthView } from "./components/AuthView";
 import { useLocalization } from "./context/LocalizationContext";
@@ -299,6 +300,7 @@ export default function App() {
 
   // --- Real-time Notification System States ---
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toast, setToast] = useState<{ id: string; title: string; message: string; type: string } | null>(null);
   const [notifications, setNotifications] = useState<AppNotification[]>(() => {
     const stored = localStorage.getItem("saver_notifications");
@@ -991,7 +993,7 @@ export default function App() {
             </button>
 
             {/* User Profile Info */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 relative">
               <div className="text-right hidden sm:block min-w-0">
                 <span className="text-[10px] font-mono text-emerald-600 font-bold uppercase tracking-wider block">Active Agent</span>
                 <span className="text-xs font-bold text-gray-800 block -mt-0.5 truncate max-w-[150px] md:max-w-[220px]" title={user.email || ""}>
@@ -999,18 +1001,26 @@ export default function App() {
                 </span>
               </div>
               
-              {localAvatar ? (
-                <img 
-                  src={localAvatar} 
-                  alt="Profile" 
-                  referrerPolicy="no-referrer"
-                  className="w-8 h-8 rounded-full border border-gray-200 object-cover"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center text-xs font-mono font-bold uppercase">
-                  {(localProfileName || "U")[0].toUpperCase()}
-                </div>
-              )}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="relative focus:outline-none rounded-full cursor-pointer hover:ring-2 hover:ring-indigo-500/20 active:scale-95 transition-all select-none"
+                aria-label="User account menu"
+                aria-haspopup="true"
+                aria-expanded={isMobileMenuOpen}
+              >
+                {localAvatar ? (
+                  <img 
+                    src={localAvatar} 
+                    alt="Profile" 
+                    referrerPolicy="no-referrer"
+                    className="w-8 h-8 rounded-full border border-gray-200 object-cover pointer-events-none"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center text-xs font-mono font-bold uppercase pointer-events-none">
+                    {(localProfileName || "U")[0].toUpperCase()}
+                  </div>
+                )}
+              </button>
 
               {/* Logout button (Desktop only, settings handles on mobile) */}
               <button
@@ -1020,6 +1030,20 @@ export default function App() {
               >
                 <LogOut size={15} />
               </button>
+
+              {/* MOBILE ACCOUNT MENU & PORTALS */}
+              <MobileAccountMenu
+                isOpen={isMobileMenuOpen}
+                onClose={() => setIsMobileMenuOpen(false)}
+                user={user}
+                localProfileName={localProfileName}
+                localAvatar={localAvatar}
+                currentTheme={currentTheme}
+                onUpdateTheme={handleUpdateTheme}
+                onOpenNotifications={() => setShowNotificationPanel(true)}
+                onNavigateSettings={() => setActiveTab("settings")}
+                onLogout={logout}
+              />
             </div>
           </div>
 
